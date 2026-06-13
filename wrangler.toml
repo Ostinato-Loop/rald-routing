@@ -6,10 +6,30 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "production"
 
-# Secrets (set via wrangler secret put or GitHub Actions):
-#   RALD_JWT_SECRET            — HMAC-SHA256 key (shared with rald-auth-core)
-#   SUPABASE_URL               — https://onxdcikfttdmnhofsuwo.supabase.co
-#   SUPABASE_SERVICE_ROLE_KEY  — Supabase service role key (consent checks)
+# ── Secrets — set via: wrangler secret put <KEY> ──────────────────────────────
+#
+# RALD_JWT_SECRET
+#   HMAC-SHA256 key shared with rald-auth-core.
+#   Used to verify user JWTs on every inbound request.
+#   Generate: openssl rand -base64 64
+#
+# SUPABASE_URL
+#   https://onxdcikfttdmnhofsuwo.supabase.co
+#   Used for consent gate checks and routing audit log.
+#
+# SUPABASE_SERVICE_ROLE_KEY
+#   Supabase service role key (full read/write on auth_consent_grants and alia_routing_log).
+#
+# MACHINE_JWT_SECRET
+#   HMAC-SHA256 key used to sign short-lived (30s) machine JWTs.
+#   Must match the MACHINE_JWT_SECRET in the ALIA resolution-engine.
+#   Generate: openssl rand -base64 64
+#
+# ALIA_RESOLUTION_ENGINE_URL
+#   Base URL of the ALIA resolution-engine service behind the AWS ALB.
+#   Example: https://api.alia.rald.cloud (no trailing slash)
+#   Dev:     https://dev.alia.rald.cloud
+#   Staging: https://staging.alia.rald.cloud
 
 [[routes]]
 pattern = "routing.rald.cloud/*"
