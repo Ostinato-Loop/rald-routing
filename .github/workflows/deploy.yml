@@ -1,0 +1,61 @@
+name: Deploy — ALIA Routing Engine › CF Worker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-rald-routing
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy rald-routing to routing.rald.cloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Deploy to Cloudflare Workers
+        env:
+          CLOUDFLARE_API_TOKEN:     ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID:    ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy
+
+      - name: Push worker secrets
+        env:
+          CLOUDFLARE_API_TOKEN:         ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID:        ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RALD_JWT_SECRET:              ${{ secrets.RALD_JWT_SECRET }}
+          SUPABASE_URL:                 ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY:    ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          printf '%s' "$RALD_JWT_SECRET"           | npx wrangler secret put RALD_JWT_SECRET           --name rald-routing
+          printf '%s' "$SUPABASE_URL"              | npx wrangler secret put SUPABASE_URL              --name rald-routing
+          printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --name rald-routing
+
+      - name: Smoke test
+        run: |
+          sleep 8
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://routing.rald.cloud/health)
+          echo "Health check: HTTP $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "WARNING: Health check returned $STATUS — worker may still be propagating"
+          fi
+
+      - name: Audit
+        if: always()
+        run: echo "AUDIT: actor=${{ github.actor }} sha=${{ github.sha }} ts=$(date -u +%Y-%m-%dT%H:%M:%SZ) result=${{ job.status }}"
