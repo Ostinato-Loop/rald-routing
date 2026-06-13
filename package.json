@@ -1,0 +1,20 @@
+{
+  "name": "rald-routing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RALD ALIA Routing Engine — Phase 6, RALD Ecosystem Finalization",
+  "scripts": {
+    "dev":   "wrangler dev --local",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.80.4"
+  },
+  "dependencies": {
+    "hono": "^4.6.3"
+  }
+}
