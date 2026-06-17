@@ -10,7 +10,8 @@ import { verifyJwt, bearerToken }              from "./lib/auth";
 import { route }                               from "./lib/router";
 import { getInstances, getInstanceById }       from "./lib/instances";
 import { writeRoutingAudit, sha256hex }        from "./lib/audit";
-import { signMachineJwt }                      from "./lib/machine-jwt";
+import { signMachineJwt }                  from "./lib/machine-jwt";
+import aliasesRoutes                         from "./routes/aliases";
 import { parseAlias, isAliasParseError }       from "./lib/validate";
 import { resolveAlias, previewAlias }          from "./lib/resolve";
 import type { ResolvePurpose }                 from "./lib/resolve";
@@ -439,5 +440,7 @@ app.get("/resolve/status", async (c) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // End P2
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+app.route("/", aliasesRoutes);
 
 export default app;
