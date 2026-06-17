@@ -28,7 +28,7 @@ export async function route(
   consent: ConsentStore
 ): Promise<RouteResult> {
   const instances = getInstances();
-  const country   = (req.country ?? (user as Record<string, unknown>).country ?? "NG") as string;
+  const country   = (req.country ?? user.country ?? "NG") as string;
   const trustScore = user.trust_score ?? 0;
   const userId     = user.id;
   const appId      = req.app_id ?? "alia";
