@@ -144,7 +144,7 @@ app.post("/alia/route", async (c) => {
       id:          user.id,
       trust_score: user.trust_score,
       trust_level: user.trust_level,
-      country:     (user as Record<string, unknown>).country ?? null,
+      country:     user.country ?? null,
     },
     latency_ms: latency,
   });
@@ -267,14 +267,14 @@ app.post("/resolve", async (c) => {
   const result = await resolveAlias(engineUrl, machineJwt, {
     alias:   parsed,
     purpose,
-    country:  body.country  ?? (user as Record<string, unknown>).country as string | null ?? null,
+    country:  body.country  ?? user.country ?? null,
     currency: body.currency ?? null,
     amount:   body.amount   ?? null,
     requestingUser: {
       id:          user.id,
       trust_score: user.trust_score,
       trust_level: user.trust_level,
-      country:     (user as Record<string, unknown>).country as string | null ?? null,
+      country:     user.country ?? null,
     },
   });
 
